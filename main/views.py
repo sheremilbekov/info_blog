@@ -72,6 +72,17 @@ class PostsViewSet(viewsets.ModelViewSet):
         serializer = PostSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=['GET'], detail=False)
+    def sort(self, request):
+        filter_ = request.query_params.get('filter')
+        if filter_ == 'A-Z':
+            queryset = self.get_queryset().order_by('title')
+        elif filter_ == 'Z-A':
+            queryset = self.get_queryset().order_by('-title')
+        else:
+            queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class PostImageView(generics.ListCreateAPIView):
     queryset = PostImage.objects.all()
